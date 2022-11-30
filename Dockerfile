@@ -1,6 +1,8 @@
 # LOCAL DEVELOPMENT
 
-FROM node:18-alpine As development
+FROM node:18 As development
+
+RUN apt-get update && apt-get install -y openssl
 
 WORKDIR /usr/src/app
 
@@ -9,6 +11,9 @@ COPY --chown=node:node package*.json ./
 RUN npm ci
 
 COPY --chown=node:node . .
+
+# TODO: uncomment when creating first model
+# RUN npm run prisma:generate
 
 USER node
 
