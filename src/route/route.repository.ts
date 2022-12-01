@@ -115,7 +115,7 @@ export class RouteRepository {
   async findOptimalRoute({
     origin,
     destination,
-    mode,
+    mode = OptimalRouteMode.SHORTEST,
   }: FindOptimalRouteParams): Promise<FindOptimalRouteReturn | null> {
     return mode === OptimalRouteMode.SHORTEST
       ? this.shortestOptimalRouteStrategy(origin, destination)

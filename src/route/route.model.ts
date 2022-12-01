@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { MinLength } from 'class-validator';
 
 export enum OptimalRouteMode {
@@ -15,6 +16,7 @@ export class FindOptimalRouteParams {
   mode?: OptimalRouteMode = OptimalRouteMode.SHORTEST;
 }
 
-export interface FindOptimalRouteReturn {
+export class FindOptimalRouteReturn {
+  @ApiProperty()
   route: string[];
 }
