@@ -6,7 +6,7 @@ import { PrismaService } from './../database/prisma.service';
 import { mockedTrainLine } from './train-line.mocked';
 import { TrainLineRepository } from './train-line.repository';
 
-describe('TrainLineRepositoryService', () => {
+describe('TrainLineRepository', () => {
   let repository: TrainLineRepository;
   let prismaService: DeepMockProxy<PrismaClient>;
 
@@ -55,7 +55,7 @@ describe('TrainLineRepositoryService', () => {
       await expect(findOne()).resolves.toBe(expectedResult);
     });
 
-    it('should not find a train line if passed a nmae that does not exist in the database', async () => {
+    it('should not find a train line if passed a name that does not exist in the database', async () => {
       // Arrange
       const expectedResult = null;
       prismaService.trainLine.findFirst.mockResolvedValue(null);
@@ -65,6 +65,33 @@ describe('TrainLineRepositoryService', () => {
 
       // Assert
       await expect(findOne()).resolves.toBe(expectedResult);
+    });
+  });
+
+  describe('findByStation', () => {
+    it('should return all train line that have the station name', async () => {
+      // Arrange
+      const expectedResult = [mockedTrainLine()];
+      prismaService.trainLine.findMany.mockResolvedValue(expectedResult);
+
+      // Act
+      const findByStation = () =>
+        repository.findByStation(expectedResult[0].stations[0]);
+
+      // Assert
+      await expect(findByStation()).resolves.toBe(expectedResult);
+    });
+
+    it('should return an empty array if passed a name that does not exist in the database', async () => {
+      // Arrange
+      const expectedResult = [];
+      prismaService.trainLine.findMany.mockResolvedValue(expectedResult);
+
+      // Act
+      const findByStation = () => repository.findByStation('Random Station');
+
+      // Assert
+      await expect(findByStation()).resolves.toBe(expectedResult);
     });
   });
 });
