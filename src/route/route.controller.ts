@@ -1,4 +1,4 @@
-import { Controller, Param } from '@nestjs/common';
+import { Controller, Param, Get } from '@nestjs/common';
 
 import { FindOptimalRouteParams, FindOptimalRouteReturn } from './route.model';
 import { RouteService } from './route.service';
@@ -7,6 +7,7 @@ import { RouteService } from './route.service';
 export class RouteController {
   constructor(private readonly routeService: RouteService) {}
 
+  @Get('')
   async findOptimalRoute(
     @Param() params: FindOptimalRouteParams,
   ): Promise<FindOptimalRouteReturn | null> {

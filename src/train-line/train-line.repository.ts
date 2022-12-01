@@ -13,7 +13,7 @@ export class TrainLineRepository {
 
   async findByStation(station: string): Promise<TrainLine[]> {
     return this.prisma.trainLine.findMany({
-      where: { stations: { hasSome: station } },
+      where: { stations: { hasSome: [station] } },
     });
   }
 

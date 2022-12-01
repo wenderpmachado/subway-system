@@ -1,3 +1,4 @@
+import { TrainLine } from '@prisma/client';
 import {
   Injectable,
   NotFoundException,
@@ -16,6 +17,65 @@ import {
 export class RouteRepository {
   constructor(private trainLineRepository: TrainLineRepository) {}
 
+  private routeMapper(
+    originStations: string[],
+    destination: string,
+    destinationLines: TrainLine[],
+  ) {
+    const [origin] = originStations;
+    let route = [origin];
+
+    const originIndex = originStations.findIndex(
+      (station) => station === origin,
+    );
+
+    const destinationIndex = originStations.findIndex(
+      (station) => station === destination,
+    );
+
+    if (destinationIndex !== -1) {
+      const diff = originIndex - destinationIndex;
+
+      route =
+        diff < 0
+          ? originStations.slice(originIndex, destinationIndex + 1)
+          : originStations.slice(destinationIndex, originIndex + 1);
+    } else {
+      // TODO: Different cases
+      // const nextOriginStations = originStations.slice(1);
+      // const [nextOrigin] = nextOriginStations;
+      // for (const { stations: destinationStations } of destinationLines) {
+      //   const newOriginIndex = destinationStations.findIndex(
+      //     (station) => station === nextOrigin,
+      //   );
+      //   if (newOriginIndex !== -1) {
+      //     // TODO: extract
+      //     route =
+      //       diff < 0
+      //         ? originStations.slice(originIndex, destinationIndex + 1)
+      //         : originStations.slice(destinationIndex, originIndex + 1);
+      //   }
+      //   route.push(
+      //     ...this.routeMapper(
+      //       nextOriginStations,
+      //       destination,
+      //       destinationLines,
+      //     ),
+      //   );
+      // }
+      // route.push(
+      //   ...this.routeMapper(
+      //     nextOriginStations,
+      //     destination,
+      //     destinationLines,
+      //     false,
+      //   ),
+      // );
+    }
+
+    return route;
+  }
+
   private async shortestOptimalRouteStrategy(
     origin: string,
     destination: string,
@@ -31,18 +91,18 @@ export class RouteRepository {
     if (isEmpty(destinationLines))
       throw new NotFoundException('Destination not found');
 
-    // FIXME: change to array version
-    const lineStations = originLines[0].stations;
+    // const lines = unionBy(originLines, destinationLines, 'id');
+    const possibleRoutes: [string[]] = [] as unknown as [string[]];
 
-    const originIndex = lineStations.findIndex((station) => station === origin);
-    const destinationIndex = lineStations.findIndex(
-      (station) => station === destination,
-    );
+    for (const { stations } of originLines) {
+      const route = this.routeMapper(stations, destination, destinationLines);
 
-    const route =
-      originIndex < destinationIndex ? lineStations : lineStations.reverse();
+      possibleRoutes.push(route);
+    }
 
-    return { route };
+    const [optimalRoute] = possibleRoutes.sort((a, b) => a.length - b.length);
+
+    return { route: optimalRoute };
   }
 
   private async lessChangingOptimalRouteStrategy(
