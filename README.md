@@ -29,6 +29,15 @@ $ npm run docker:up:local
 
 The API will be available at http://localhost:3000/
 
+## Exploring and manipulating the database
+
+```bash
+# development
+$ npm run prisma:studio
+```
+
+The manager will be available at http://localhost:5555/
+
 ## Test
 
 ```bash
