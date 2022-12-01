@@ -1,6 +1,6 @@
 {
   "name": "@subway-system/api",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Subway System API",
   "author": "Wender Machado <wenderpmachado@gmail.com>",
   "private": true,
