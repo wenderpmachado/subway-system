@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "3bb36f55-bc0a-4d24-9a86-6a16a7956bab",
+		"name": "Subway System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "861111"
+	},
+	"item": [
+		{
+			"name": "POST /train-line",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"4\",\r\n    \"stations\": [\"Jhon Light\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/train-line",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"train-line"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /route",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/route?origin=Houston&destination=Jhon Light",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"route"
+					],
+					"query": [
+						{
+							"key": "origin",
+							"value": "Houston"
+						},
+						{
+							"key": "destination",
+							"value": "Jhon Light"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "API_URL",
+			"value": "API_URL"
+		}
+	]
+}

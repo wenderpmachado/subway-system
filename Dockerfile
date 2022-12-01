@@ -12,8 +12,7 @@ RUN npm ci
 
 COPY --chown=node:node . .
 
-# TODO: uncomment when creating first model
-# RUN npm run prisma:generate
+RUN npm run prisma:generate
 
 USER node
 
