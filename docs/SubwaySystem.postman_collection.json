@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"1\",\r\n    \"stations\": [\"Canal\", \"Houston\", \"Christopher\", \"14th\"]\r\n}",
+					"raw": "{\r\n    \"name\": \"4\",\r\n    \"stations\": [\"Jhon Light\"]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -38,7 +38,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{API_URL}}/route?origin=Houston&destination=23rd",
+					"raw": "{{API_URL}}/route?origin=Houston&destination=Jhon Light",
 					"host": [
 						"{{API_URL}}"
 					],
@@ -52,7 +52,7 @@
 						},
 						{
 							"key": "destination",
-							"value": "23rd"
+							"value": "Jhon Light"
 						}
 					]
 				}

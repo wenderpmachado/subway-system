@@ -29,6 +29,10 @@ $ npm run docker:up:local
 
 The API will be available at http://localhost:3000/
 
+And the Swagger at http://localhost:3000/api
+
+![Swagger](./.github/images/swagger.png)
+
 ## Exploring and manipulating the database
 
 ```bash
@@ -37,6 +41,8 @@ $ npm run prisma:studio
 ```
 
 The manager will be available at http://localhost:5555/
+
+![Studio](./.github/images/studio.png)
 
 ## Test
 
@@ -51,10 +57,10 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+![Coverage](./.github/images/coverage.png)
+
 <!-- ## :closed_book: License -->
 ## :closed_book:
 
-<!-- Released in 2022. -->
-<!-- This project is under the [MIT license](https://github.com/wenderpmachado/subway-system.git/master/LICENSE). -->
-
+Released in 2022
 Made by [Wender Machado](https://github.com/wenderpmachado) 🚀
