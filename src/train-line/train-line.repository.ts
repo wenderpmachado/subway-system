@@ -7,6 +7,10 @@ import { PrismaService } from './../database/prisma.service';
 export class TrainLineRepository {
   constructor(private prisma: PrismaService) {}
 
+  async findOne(name: string): Promise<TrainLine | null> {
+    return this.prisma.trainLine.findFirst({ where: { name } });
+  }
+
   async create(params: {
     data: Prisma.TrainLineCreateInput;
   }): Promise<TrainLine> {

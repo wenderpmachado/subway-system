@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { mockDeep } from 'jest-mock-extended';
@@ -35,6 +36,21 @@ describe('TrainLineService', () => {
       jest.spyOn(repository, 'create').mockResolvedValue(expectedResult);
 
       expect(await service.create(params)).toBe(expectedResult);
+    });
+
+    it('when name already exists, it should not create a new train line', async () => {
+      const expectedResult = mockedTrainLine();
+
+      const params: Prisma.TrainLineCreateInput = {
+        name: expectedResult.name,
+        stations: expectedResult.stations,
+      };
+
+      jest.spyOn(repository, 'findOne').mockResolvedValue(expectedResult);
+
+      await expect(service.create(params)).rejects.toThrowError(
+        ConflictException,
+      );
     });
   });
 });

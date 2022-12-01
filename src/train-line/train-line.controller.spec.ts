@@ -8,7 +8,7 @@ import { TrainLineRepository } from './train-line.repository';
 import { TrainLineController } from './train-line.controller';
 import { mockedTrainLine } from './train-line.mocked';
 import { TrainLineService } from './train-line.service';
-import { ICreateTrainLine } from './train-line.interface';
+import { CreateTrainLine } from './train-line.model';
 
 describe('TrainLineController', () => {
   let controller: TrainLineController;
@@ -31,7 +31,7 @@ describe('TrainLineController', () => {
     it('should create a new train line', async () => {
       const expectedResult = mockedTrainLine();
 
-      const body: ICreateTrainLine = {
+      const body: CreateTrainLine = {
         name: expectedResult.name,
         stations: expectedResult.stations,
       };
