@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaClient, TrainLine } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { mockDeep } from 'jest-mock-extended';
 
 import { mockedTrainLine } from '../train-line/train-line.mocked';
 import { TrainLineRepository } from './../train-line/train-line.repository';
@@ -16,7 +16,6 @@ import { RouteRepository } from './route.repository';
 describe('RouteRepository', () => {
   let routeRepository: RouteRepository;
   let trainLineRepository: TrainLineRepository;
-  let prismaService: DeepMockProxy<PrismaClient>;
 
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -28,7 +27,6 @@ describe('RouteRepository', () => {
 
     routeRepository = moduleRef.get(RouteRepository);
     trainLineRepository = moduleRef.get(TrainLineRepository);
-    prismaService = moduleRef.get(PrismaService);
   });
 
   describe('findOptimalRoute', () => {
@@ -194,34 +192,79 @@ describe('RouteRepository', () => {
       );
     });
 
-    // it('when an origin is in one line and the destination in other, but there is one in the middle, then return the junction of the two', async () => {
-    //   const params: FindOptimalRouteParams = {
-    //     origin: 'A',
-    //     destination: 'F',
-    //     mode: OptimalRouteMode.SHORTEST,
-    //   };
+    it('when an origin is in one line and the destination in other, but there is one in the middle, then return the junction of the two', async () => {
+      const params: FindOptimalRouteParams = {
+        origin: 'A',
+        destination: 'F',
+        mode: OptimalRouteMode.SHORTEST,
+      };
 
-    //   const trainLines: TrainLine[] = [
-    //     mockedTrainLine(['A', 'B', 'C']),
-    //     mockedTrainLine(['B', 'D', 'E']),
-    //     mockedTrainLine(['D', 'F']),
-    //   ];
+      const trainLines: TrainLine[] = [
+        mockedTrainLine(['A', 'B', 'C']),
+        mockedTrainLine(['B', 'D', 'E']),
+        mockedTrainLine(['D', 'F']),
+      ];
 
-    //   jest
-    //     .spyOn(trainLineRepository, 'findByStation')
-    //     .mockResolvedValueOnce([trainLines[0]])
-    //     .mockResolvedValueOnce([trainLines[2]])
-    //     .mockResolvedValueOnce([trainLines[1]]);
+      jest
+        .spyOn(trainLineRepository, 'findByStation')
+        .mockResolvedValueOnce([trainLines[0]]) // origin
+        .mockResolvedValueOnce([trainLines[2]]) // destination
 
-    //   const optimalRouteExpected = ['A', 'B', 'D', 'F'];
+        .mockResolvedValueOnce([trainLines[1]]) // intermediare 1 - findByStation(B)
+        .mockResolvedValueOnce([trainLines[2]]); // intermediare 2 - findByStation(D)
 
-    //   const expectedResult: FindOptimalRouteReturn = {
-    //     route: optimalRouteExpected,
-    //   };
+      const optimalRouteExpected = ['A', 'B', 'D', 'F'];
 
-    //   expect(await routeRepository.findOptimalRoute(params)).toMatchObject(
-    //     expectedResult,
-    //   );
-    // });
+      const expectedResult: FindOptimalRouteReturn = {
+        route: optimalRouteExpected,
+      };
+
+      expect(await routeRepository.findOptimalRoute(params)).toMatchObject(
+        expectedResult,
+      );
+    });
+
+    it('when an origin is in one line and the destination in other, but there is one in the middle and different ways, then return the optimal route', async () => {
+      const params: FindOptimalRouteParams = {
+        origin: 'A',
+        destination: 'F',
+        mode: OptimalRouteMode.SHORTEST,
+      };
+
+      const trainLines: TrainLine[] = [
+        mockedTrainLine(['A', 'C', 'B']),
+        mockedTrainLine(['B', 'E', 'D']),
+        mockedTrainLine(['D', 'F']),
+      ];
+
+      const optimalTrainLines: TrainLine[] = [
+        mockedTrainLine(['A', 'B', 'C']),
+        mockedTrainLine(['B', 'D', 'E']),
+        mockedTrainLine(['D', 'F']),
+      ];
+
+      jest
+        .spyOn(trainLineRepository, 'findByStation')
+        .mockResolvedValueOnce([trainLines[0], optimalTrainLines[0]]) // origin
+        .mockResolvedValueOnce([trainLines[2], optimalTrainLines[2]]) // destination
+
+        .mockResolvedValueOnce([]) // intermediare 1 - findByStation(C)
+        .mockResolvedValueOnce([trainLines[1]]) // intermediare 2 - findByStation(B)
+        .mockResolvedValueOnce([]) // intermediare 2 - findByStation(E)
+        .mockResolvedValueOnce([trainLines[2]]) // intermediare 2 - findByStation(D)
+
+        .mockResolvedValueOnce([optimalTrainLines[1]]) // intermediare 1 - findByStation(B)
+        .mockResolvedValueOnce([optimalTrainLines[2]]); // intermediare 2 - findByStation(D)
+
+      const optimalRouteExpected = ['A', 'B', 'D', 'F'];
+
+      const expectedResult: FindOptimalRouteReturn = {
+        route: optimalRouteExpected,
+      };
+
+      expect(await routeRepository.findOptimalRoute(params)).toMatchObject(
+        expectedResult,
+      );
+    });
   });
 });
