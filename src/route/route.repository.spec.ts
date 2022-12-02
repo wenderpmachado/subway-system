@@ -166,33 +166,33 @@ describe('RouteRepository', () => {
       );
     });
 
-    // it('when an origin is in one line and the destination in other, then return the junction of the two', async () => {
-    //   const params: FindOptimalRouteParams = {
-    //     origin: 'A',
-    //     destination: 'F',
-    //     mode: OptimalRouteMode.SHORTEST,
-    //   };
+    it('when an origin is in one line and the destination in other, then return the junction of the two', async () => {
+      const params: FindOptimalRouteParams = {
+        origin: 'A',
+        destination: 'F',
+        mode: OptimalRouteMode.SHORTEST,
+      };
 
-    //   const trainLines: TrainLine[] = [
-    //     mockedTrainLine(['A', 'B', 'C']),
-    //     mockedTrainLine(['B', 'F']),
-    //   ];
+      const trainLines: TrainLine[] = [
+        mockedTrainLine(['A', 'B', 'C']),
+        mockedTrainLine(['B', 'F']),
+      ];
 
-    //   jest
-    //     .spyOn(trainLineRepository, 'findByStation')
-    //     .mockResolvedValueOnce([trainLines[0]])
-    //     .mockResolvedValueOnce([trainLines[1]]);
+      jest
+        .spyOn(trainLineRepository, 'findByStation')
+        .mockResolvedValueOnce([trainLines[0]])
+        .mockResolvedValueOnce([trainLines[1]]);
 
-    //   const optimalRouteExpected = ['A', 'B', 'F'];
+      const optimalRouteExpected = ['A', 'B', 'F'];
 
-    //   const expectedResult: FindOptimalRouteReturn = {
-    //     route: optimalRouteExpected,
-    //   };
+      const expectedResult: FindOptimalRouteReturn = {
+        route: optimalRouteExpected,
+      };
 
-    //   expect(await routeRepository.findOptimalRoute(params)).toMatchObject(
-    //     expectedResult,
-    //   );
-    // });
+      expect(await routeRepository.findOptimalRoute(params)).toMatchObject(
+        expectedResult,
+      );
+    });
 
     // it('when an origin is in one line and the destination in other, but there is one in the middle, then return the junction of the two', async () => {
     //   const params: FindOptimalRouteParams = {

@@ -41,36 +41,46 @@ export class RouteRepository {
           ? originStations.slice(originIndex, destinationIndex + 1)
           : originStations.slice(destinationIndex, originIndex + 1);
     } else {
-      // TODO: Different cases
-      // const nextOriginStations = originStations.slice(1);
-      // const [nextOrigin] = nextOriginStations;
-      // for (const { stations: destinationStations } of destinationLines) {
-      //   const newOriginIndex = destinationStations.findIndex(
-      //     (station) => station === nextOrigin,
-      //   );
-      //   if (newOriginIndex !== -1) {
-      //     // TODO: extract
-      //     route =
-      //       diff < 0
-      //         ? originStations.slice(originIndex, destinationIndex + 1)
-      //         : originStations.slice(destinationIndex, originIndex + 1);
-      //   }
-      //   route.push(
-      //     ...this.routeMapper(
-      //       nextOriginStations,
-      //       destination,
-      //       destinationLines,
-      //     ),
-      //   );
-      // }
-      // route.push(
-      //   ...this.routeMapper(
-      //     nextOriginStations,
-      //     destination,
-      //     destinationLines,
-      //     false,
-      //   ),
-      // );
+      const nextOriginStations = originStations.slice(1); // ['B', 'C']
+      const [nextOrigin] = nextOriginStations; // B route.push(nextOrigin);
+
+      for (const { stations: destinationStations } of destinationLines) {
+        // destinationStations === ['B', 'F']
+        const newOriginIndex = destinationStations.findIndex(
+          (station) => station === nextOrigin,
+        );
+
+        const newDestinationIndex = destinationStations.findIndex(
+          (station) => station === destination,
+        );
+
+        if (newOriginIndex !== -1) {
+          const diff = newOriginIndex - newDestinationIndex;
+
+          const partialRoute =
+            diff < 0
+              ? destinationStations.slice(
+                  newOriginIndex,
+                  newDestinationIndex + 1,
+                )
+              : destinationStations.slice(
+                  newDestinationIndex,
+                  newOriginIndex + 1,
+                );
+
+          route.push(...partialRoute);
+
+          break;
+        } else {
+          route.push(
+            ...this.routeMapper(
+              nextOriginStations,
+              destination,
+              destinationLines,
+            ),
+          );
+        }
+      }
     }
 
     return route;
