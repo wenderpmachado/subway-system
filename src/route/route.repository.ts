@@ -17,63 +17,93 @@ import {
 export class RouteRepository {
   constructor(private trainLineRepository: TrainLineRepository) {}
 
-  private routeMapper(
-    originStations: string[],
+  private getPartialRoute(
+    stations: string[],
+    origin: string,
     destination: string,
-    destinationLines: TrainLine[],
   ) {
-    const [origin] = originStations;
-    let route = [origin];
+    const originIndex = stations.findIndex((station) => station === origin);
 
-    const originIndex = originStations.findIndex(
-      (station) => station === origin,
-    );
-
-    const destinationIndex = originStations.findIndex(
+    const destinationIndex = stations.findIndex(
       (station) => station === destination,
     );
 
-    if (destinationIndex !== -1) {
-      const diff = originIndex - destinationIndex;
+    if (destinationIndex === -1) return -1;
 
-      route =
-        diff < 0
-          ? originStations.slice(originIndex, destinationIndex + 1)
-          : originStations.slice(destinationIndex, originIndex + 1);
+    const diff = originIndex - destinationIndex;
+
+    return diff < 0
+      ? stations.slice(originIndex, destinationIndex + 1)
+      : stations.slice(destinationIndex, originIndex + 1);
+  }
+
+  private async routeMapper(
+    originLine: TrainLine,
+    destination: string,
+    destinationLines: TrainLine[],
+  ) {
+    const { stations: originStations, id } = originLine;
+    const [origin] = originStations;
+
+    let route: string[] = [origin];
+    let partialRoute: string[] | -1;
+
+    partialRoute = this.getPartialRoute(originStations, origin, destination);
+
+    if (partialRoute !== -1) {
+      route = partialRoute;
     } else {
-      // TODO: Different cases
-      // const nextOriginStations = originStations.slice(1);
-      // const [nextOrigin] = nextOriginStations;
-      // for (const { stations: destinationStations } of destinationLines) {
-      //   const newOriginIndex = destinationStations.findIndex(
-      //     (station) => station === nextOrigin,
-      //   );
-      //   if (newOriginIndex !== -1) {
-      //     // TODO: extract
-      //     route =
-      //       diff < 0
-      //         ? originStations.slice(originIndex, destinationIndex + 1)
-      //         : originStations.slice(destinationIndex, originIndex + 1);
-      //   }
-      //   route.push(
-      //     ...this.routeMapper(
-      //       nextOriginStations,
-      //       destination,
-      //       destinationLines,
-      //     ),
-      //   );
-      // }
-      // route.push(
-      //   ...this.routeMapper(
-      //     nextOriginStations,
-      //     destination,
-      //     destinationLines,
-      //     false,
-      //   ),
-      // );
+      for (const nextOrigin of originStations.slice(1)) {
+        for (const { stations: destinationStations } of destinationLines) {
+          partialRoute = this.getPartialRoute(
+            destinationStations,
+            destination,
+            nextOrigin,
+          );
+
+          if (partialRoute !== -1) {
+            route.push(...partialRoute);
+
+            break;
+          }
+
+          const hasOriginStationsDestination =
+            originStations.includes(destination);
+
+          if (!hasOriginStationsDestination) {
+            route.push(nextOrigin);
+            const intermediateLines =
+              await this.trainLineRepository.findByStation(nextOrigin, id);
+
+            if (intermediateLines) {
+              for (const intermediateLine of intermediateLines) {
+                const { stations: intermediateStations } = intermediateLine;
+                const isIntermediateIncluded = destinationStations.some(
+                  (destinationStation) =>
+                    intermediateStations.includes(destinationStation),
+                );
+
+                if (isIntermediateIncluded) {
+                  const intermediateRoute = await this.routeMapper(
+                    intermediateLine,
+                    destination,
+                    destinationLines,
+                  );
+
+                  route.push(...intermediateRoute);
+
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (route.at(-1) === destination) break;
+      }
     }
 
-    return route;
+    return [...new Set(route)];
   }
 
   private async shortestOptimalRouteStrategy(
@@ -91,11 +121,14 @@ export class RouteRepository {
     if (isEmpty(destinationLines))
       throw new NotFoundException('Destination not found');
 
-    // const lines = unionBy(originLines, destinationLines, 'id');
     const possibleRoutes: [string[]] = [] as unknown as [string[]];
 
-    for (const { stations } of originLines) {
-      const route = this.routeMapper(stations, destination, destinationLines);
+    for (const originLine of originLines) {
+      const route = await this.routeMapper(
+        originLine,
+        destination,
+        destinationLines,
+      );
 
       possibleRoutes.push(route);
     }

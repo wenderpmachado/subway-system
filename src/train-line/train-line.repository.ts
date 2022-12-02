@@ -11,9 +11,15 @@ export class TrainLineRepository {
     return this.prisma.trainLine.findFirst({ where: { name } });
   }
 
-  async findByStation(station: string): Promise<TrainLine[]> {
+  async findByStation(
+    station: string,
+    excludeId?: number,
+  ): Promise<TrainLine[]> {
     return this.prisma.trainLine.findMany({
-      where: { stations: { hasSome: [station] } },
+      where: {
+        stations: { hasSome: [station] },
+        id: { not: excludeId },
+      },
     });
   }
 
