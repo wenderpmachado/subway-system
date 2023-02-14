@@ -2,6 +2,8 @@
   Subway System Challenge
 </p></h1>
 
+<i>A project that provides a basic implementation of a subway network. It includes classes for stations, lines, and a subway system that can be used to model and navigate through a subway system. The code is written in NestJS (Typescript + Node.js) and can be used as a starting point for more complex subway system projects.</i>
+
 ## 🔧 Prerequisite
 
 To bring up the application, you **MUST** first:
